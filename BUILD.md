@@ -1,8 +1,10 @@
 # Compile ObsidianIRC
+
 This covers instructions for how to manually build ObsidianIRC from source for different platforms. If you are willing
 to simply install it, maybe take a look at [Install instructions](INSTALL.md) first.
 
 ## Clone Repo
+
 ```sh
 cd ~
 git clone https://github.com/ObsidianIRC/ObsidianIRC
@@ -11,13 +13,16 @@ npm install
 ```
 
 ### Web
+
 ```sh
 npm run build
 cp -R dist/* /var/www/html/
 ```
 
 #### Building for a specific server
-You can build the frontend by setting the following environment variables before running the `npm build` command.
+
+You can build the frontend by setting the following environment variables before running `npm run build`.
+
 ```sh
 # Required server URL
 VITE_DEFAULT_IRC_SERVER=ws://localhost:8097
@@ -52,6 +57,12 @@ VITE_DEFAULT_OAUTH_SERVER_PROVIDER="github"
 # publish /.well-known/openid-configuration.
 VITE_DEFAULT_OAUTH_AUTHORIZE_URL="https://github.com/login/oauth/authorize"
 VITE_DEFAULT_OAUTH_TOKEN_URL="https://github.com/login/oauth/access_token"
+
+# Optional: baked via vite `define` as `__BACKEND_URL__` (see vite.config.ts); available but not yet referenced in source.
+VITE_BACKEND_URL=http://localhost:8080
+# GIF search/embeds (`import.meta.env` in `GifSelector` / Tenor previews in `MediaPreview`)
+VITE_GIPHY_API_KEY=
+VITE_TENOR_API_KEY=
 ```
 
 #### Provider quick-reference
@@ -99,15 +110,17 @@ oauth-provider "github" {
 };
 ```
 
-
 ### Docker
+
 ```sh
 docker build -t obsidianirc .
 docker run -p 80:80 obsidianirc
 ```
 
 #### Building Docker with custom configuration
-You can pass build arguments to customize the IRC server settings:
+
+You can pass build arguments to customize the IRC server settings. The image forwards the same **`VITE_*`** names as **`vite.config.ts`** (IRC, OAuth lock-mode, `VITE_BACKEND_URL`) plus optional **`VITE_GIPHY_API_KEY`** / **`VITE_TENOR_API_KEY`** for GIF search/embeds (`Dockerfile` lists every supported `ARG`).
+
 ```sh
 docker build \
   --build-arg VITE_DEFAULT_IRC_SERVER=ws://your-server:port \
@@ -118,21 +131,21 @@ docker build \
   --build-arg VITE_DEFAULT_OAUTH_PROVIDER_LABEL="Logto" \
   --build-arg VITE_DEFAULT_OAUTH_ISSUER="https://my-tenant.logto.app/oidc" \
   --build-arg VITE_DEFAULT_OAUTH_CLIENT_ID="m0obbyircd1234" \
+  --build-arg VITE_BACKEND_URL=https://api.example.net \
+  --build-arg VITE_TENOR_API_KEY=your-tenor-key \
   -t obsidianirc .
 ```
 
-### MACOS
-```sh
-npm run tauri build -- --bundles dmg
-```
-
 ### LINUX
+
+#### npm / Tauri CLI
+
 ```sh
 npm run tauri build -- --bundles appimage
 ```
 
-
 For distribution packages:
+
 ```sh
 # Build .deb for Debian/Ubuntu
 npm run tauri build -- --bundles deb
@@ -144,27 +157,53 @@ npm run tauri build -- --bundles rpm
 npm run tauri build -- --bundles appimage
 ```
 
-### WINDOWS
+#### Nix (flake)
+
+[Nix](https://nixos.org/download/) with [flakes](https://wiki.nixos.org/wiki/Flakes) enabled. **`devShells`** and **`packages.obsidianirc`** exist only for **`x86_64-linux`** and **`aarch64-linux`**; on macOS/Windows use a normal host Node + Rust (rustup / rust-toolchain.toml) toolchain ([AGENTS.md](AGENTS.md)). Web and Docker builds are outside this flake.
+
 ```sh
-npm run build -- --bundles nsis
+nix develop              # Node 22 + Tauri Linux deps + rustup
+nix build .#obsidianirc  # → result/bin/ObsidianIRC
+```
+
+**direnv:** [.envrc](.envrc) uses `use flake` — [CONTRIBUTING.md](CONTRIBUTING.md).
+
+- **Home Manager:** `outputs.homeManagerModules.obsidianirc` and **`outputs.homeModules.obsidianirc`** are the **same module** (`programs.obsidianirc.*`; pick either spelling — see **[Home Manager manual — Flakes](https://nix-community.github.io/home-manager/index.xhtml#ch-nix-flakes)**). **`home.stateVersion` stays on the value from your original HM install.** Import this module alongside `home-manager.nixosModules.home-manager` on **NixOS**. Follow the manual’s recommendation: **`home-manager.useGlobalPkgs = true`**, **`home-manager.useUserPackages = true`**, **`home-manager.extraSpecialArgs = { inherit inputs; };`** when referencing flake inputs from `home.nix`. Prefer **`inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs"`** in your consumer flake. With **`useGlobalPkgs`**, merge [nix/overlay.nix](nix/overlay.nix) **where system `pkgs` is built** (not only `nixpkgs.overlays` under `home-manager.users.<name>`). Options and MIME notes: [nix/hm-module.nix](nix/hm-module.nix). Autostart needs **`xdg.enable = true`** (asserted).
+- **Checks:** `nix flake check` evaluates the HM module with a stub package (not a full Tauri build). One-shot: `nix build .#checks.x86_64-linux.home-manager-module` (or `aarch64-linux`).
+- **When things break:** if `package-lock.json` changes, update `npmDeps` in [nix/obsidianirc.nix](nix/obsidianirc.nix). After nixpkgs bumps, keep GTK/WebKit-related inputs in [flake.nix](flake.nix) and [nix/obsidianirc.nix](nix/obsidianirc.nix) aligned.
+
+### macOS
+
+```sh
+npm run tauri build -- --bundles dmg
+```
+
+### WINDOWS
+
+```sh
+npm run tauri build -- --bundles nsis
 ```
 
 ### Android
+
 ```sh
 npm run tauri android build -- --apk
 ```
 
 ### IOS
+
 First open xcode with the tauri ws config server running:
+
 ```sh
 npm run tauri ios build -- --open
 ```
 
 Set the signing team in the xcode project settings and then build the app:
+
 ```sh
 npm run tauri ios build
 ```
 
 ## Tauri
-Follow the Tauri docs for more info on native builds https://tauri.app/distribute/
 
+Follow the Tauri docs for more info on native builds [https://tauri.app/distribute/](https://tauri.app/distribute/)
