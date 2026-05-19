@@ -83,7 +83,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG_NAME: ${{ steps.package-version.outputs.tag_name }}
 
-  verify-linux-nix:
+  update-linux-nix:
     if: github.ref_type == 'tag'
     runs-on: ubuntu-latest
     timeout-minutes: 60
