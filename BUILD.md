@@ -168,7 +168,7 @@ nix build .#obsidianirc  # → result/bin/ObsidianIRC
 
 - **direnv:** `direnv allow` activates [.envrc](.envrc) (`use flake`).
 - **Home Manager:** `programs.obsidianirc` module — see [nix/hm-module.nix](nix/hm-module.nix) for options and usage.
-- **Maintenance:** when `package-lock.json` changes, run `nix run .#update-npm-deps-hash` before pushing (lefthook does this locally if Nix is installed). On version tag releases, [`publish.yaml`](.github/workflows/publish.yaml) verifies the Nix package and commits any hash fix to `main`.
+- **Maintenance:** when `package-lock.json` changes, run `nix run .#update-npm-deps-hash` if you have Nix locally. On version tag releases, [`publish.yaml`](.github/workflows/publish.yaml) (`verify-linux-nix`) verifies the Nix package and commits any hash fix to `main`.
 ### macOS
 
 ```sh

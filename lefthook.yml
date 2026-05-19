@@ -30,17 +30,3 @@ pre-commit:
           echo "Catalog changes have been staged. Re-run git commit to proceed."
           exit 1
         fi
-    npm-deps-hash:
-      glob: "package-lock.json"
-      skip:
-        - run: "! command -v nix"
-      run: |
-        set -e
-        nix run .#update-npm-deps-hash
-        if ! git diff --exit-code --quiet nix/obsidianirc.nix 2>/dev/null; then
-          git add nix/obsidianirc.nix
-          echo ""
-          echo "npmDeps hash updated in nix/obsidianirc.nix. Changes have been staged."
-          echo "Re-run git commit to proceed."
-          exit 1
-        fi
