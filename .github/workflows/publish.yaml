@@ -111,6 +111,9 @@ jobs:
         run: |
           set -euo pipefail
 
+          # Verify step may patch this file; discard before switching to main.
+          git restore nix/obsidianirc.nix
+
           git fetch origin main
           git checkout main
           git pull --rebase origin main
