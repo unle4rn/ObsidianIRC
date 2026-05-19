@@ -21,7 +21,7 @@ npm run format; npm run fix:unsafe; npm run test; npm run build
 
 ## Tool versions
 
-- **JavaScript:** **Node ≥22** ([`package.json` `engines`](package.json)); **`npm ci`** from the repo root for reproducible installs.
+- **JavaScript:** **Node ≥22** ([`package.json` `engines`](package.json)); **`npm install`** from the repo root.
 - **Rust (Tauri):** [`rust-toolchain.toml`](rust-toolchain.toml) — **stable** + **rustfmt**/**clippy**; MSRV in [src-tauri/Cargo.toml](src-tauri/Cargo.toml).
 
 ---
