@@ -26,14 +26,11 @@ npm run format; npm run fix:unsafe; npm run test; npm run build
 
 ---
 
-## Nix (this flake)
+## Nix
 
-- **`nix develop`** — Node 22, Tauri Linux libs (WebKitGTK 4.1, GTK 3, OpenSSL, Ayatana appindicator, …), **rustup** from `rust-toolchain.toml`. **ObsidianIRC’s flake only declares `devShells` + `packages` for `x86_64-linux` / `aarch64-linux`** (you can still install Nix elsewhere; there is no matching devShell for Darwin/Windows in-tree today). **macOS/Windows** → extend [flake.nix](flake.nix) or use host **Node** + **rustup** (same `rust-toolchain.toml`).
-- **direnv:** [.envrc](.envrc) **`use flake`** after **`direnv allow`**; optional faster reloads via [nix-direnv](https://github.com/nix-community/nix-direnv) (**.direnv/** gitignored). Hook: [direnv shell integration](https://direnv.net/docs/hook.html).
-- **`nix build .#obsidianirc`** (**`x86_64`** / **`aarch64`**) — **`cargo-tauri.hook`**. Bump **`npmDeps`** in [nix/obsidianirc.nix](nix/obsidianirc.nix) when **`package-lock.json`** changes and Nix errors.
-- **Wayland / WebKit quirks** — try X11 or pin **`nixpkgs`** (NixOS/Tauri discussions).
-- **Home Manager:** **`outputs.homeManagerModules.obsidianirc`** and **`outputs.homeModules.obsidianirc`** (same attr). Follow **[Home Manager manual — Flakes](https://nix-community.github.io/home-manager/index.xhtml#ch-nix-flakes)**: **`inputs.home-manager.inputs.nixpkgs.follows`** in consumer flakes, **`useGlobalPkgs`**, **`useUserPackages`**, **`extraSpecialArgs`**. **BUILD.md** has overlay/`pkgs` caveats for **`programs.obsidianirc`** / **`viteBuildEnv`**.
-
+- **`nix develop`** — full dev environment (Node 22 + Tauri Linux deps + rustup). Linux only (`x86_64`/`aarch64`).
+- **`nix build .#obsidianirc`** — produces `result/bin/ObsidianIRC`. Bump `npmDeps` in [nix/obsidianirc.nix](nix/obsidianirc.nix) when `package-lock.json` changes.
+- Details: [BUILD.md — Nix (flake)](BUILD.md#nix-flake)
 ---
 
 ## Project Layout

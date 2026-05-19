@@ -14,11 +14,7 @@ Grab the latest version for your platform from [https://github.com/ObsidianIRC/O
   - `.deb` package: `ObsidianIRC_*_arm64.deb` for Debian/Ubuntu
   - `.rpm` package: `ObsidianIRC-*-1.aarch64.rpm` for Fedora/CentOS/RHEL
   - AppImage: `ObsidianIRC_*_aarch64.AppImage` for any Linux distro
-- **NixOS / Nix-with-flakes (`x86_64-linux`, `aarch64-linux`)**:
-  - Direct build: `nix build .#obsidianirc`
-  - Home Manager module: `programs.obsidianirc` — see [nix/hm-module.nix](nix/hm-module.nix)
-  - Build instructions: [BUILD.md — Nix (flake)](BUILD.md#nix-flake)
-  - Note: This flake does not ship packages or devShells for macOS/Windows under Nix (use releases above or host toolchains — [BUILD.md](BUILD.md))
+- **NixOS / Nix-with-flakes (`x86_64-linux`, `aarch64-linux`)**: Build from source — see [BUILD.md — Nix (flake)](BUILD.md#nix-flake).
 
 ### macOS
 

@@ -159,19 +159,16 @@ npm run tauri build -- --bundles appimage
 
 #### Nix (flake)
 
-[Nix](https://nixos.org/download/) with [flakes](https://wiki.nixos.org/wiki/Flakes) enabled. **`devShells`** and **`packages.obsidianirc`** exist only for **`x86_64-linux`** and **`aarch64-linux`**; on macOS/Windows use a normal host Node + Rust (rustup / rust-toolchain.toml) toolchain ([AGENTS.md](AGENTS.md)). Web and Docker builds are outside this flake.
+[Nix](https://nixos.org/download/) with [flakes](https://wiki.nixos.org/wiki/Flakes) enabled. Linux only (`x86_64-linux`, `aarch64-linux`).
 
 ```sh
 nix develop              # Node 22 + Tauri Linux deps + rustup
 nix build .#obsidianirc  # → result/bin/ObsidianIRC
 ```
 
-**direnv:** [.envrc](.envrc) uses `use flake` — [CONTRIBUTING.md](CONTRIBUTING.md).
-
-- **Home Manager:** `outputs.homeManagerModules.obsidianirc` and **`outputs.homeModules.obsidianirc`** are the **same module** (`programs.obsidianirc.*`; pick either spelling — see **[Home Manager manual — Flakes](https://nix-community.github.io/home-manager/index.xhtml#ch-nix-flakes)**). **`home.stateVersion` stays on the value from your original HM install.** Import this module alongside `home-manager.nixosModules.home-manager` on **NixOS**. Follow the manual’s recommendation: **`home-manager.useGlobalPkgs = true`**, **`home-manager.useUserPackages = true`**, **`home-manager.extraSpecialArgs = { inherit inputs; };`** when referencing flake inputs from `home.nix`. Prefer **`inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs"`** in your consumer flake. With **`useGlobalPkgs`**, merge [nix/overlay.nix](nix/overlay.nix) **where system `pkgs` is built** (not only `nixpkgs.overlays` under `home-manager.users.<name>`). Options and MIME notes: [nix/hm-module.nix](nix/hm-module.nix). Autostart needs **`xdg.enable = true`** (asserted).
-- **Checks:** `nix flake check` evaluates the HM module with a stub package (not a full Tauri build). One-shot: `nix build .#checks.x86_64-linux.home-manager-module` (or `aarch64-linux`).
-- **When things break:** if `package-lock.json` changes, update `npmDeps` in [nix/obsidianirc.nix](nix/obsidianirc.nix). After nixpkgs bumps, keep GTK/WebKit-related inputs in [flake.nix](flake.nix) and [nix/obsidianirc.nix](nix/obsidianirc.nix) aligned.
-
+- **direnv:** `direnv allow` activates [.envrc](.envrc) (`use flake`).
+- **Home Manager:** `programs.obsidianirc` module — see [nix/hm-module.nix](nix/hm-module.nix) for options and usage.
+- **Maintenance:** bump `npmDeps` in [nix/obsidianirc.nix](nix/obsidianirc.nix) when `package-lock.json` changes.
 ### macOS
 
 ```sh
