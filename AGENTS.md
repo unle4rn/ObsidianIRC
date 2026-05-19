@@ -29,7 +29,7 @@ npm run format; npm run fix:unsafe; npm run test; npm run build
 ## Nix
 
 - **`nix develop`** — full dev environment (Node 22 + Tauri Linux deps + rustup). Linux only (`x86_64`/`aarch64`).
-- **`nix build .#obsidianirc`** — produces `result/bin/ObsidianIRC`. Bump `npmDeps` in [nix/obsidianirc.nix](nix/obsidianirc.nix) when `package-lock.json` changes.
+- **`nix build .#obsidianirc`** — produces `result/bin/ObsidianIRC`. When `package-lock.json` changes, run `nix run .#update-npm-deps-hash` before pushing (lefthook does this locally if Nix is installed); release tags also sync the hash to `main` via [`publish.yaml`](.github/workflows/publish.yaml).
 - Details: [BUILD.md — Nix (flake)](BUILD.md#nix-flake)
 ---
 
