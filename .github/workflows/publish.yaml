@@ -101,17 +101,9 @@ jobs:
           extra_nix_config: |
             experimental-features = nix-command flakes
 
-      - name: Verify tagged release builds
-        run: |
-          nix run .#update-npm-deps-hash
-          nix flake check && nix build .#obsidianirc --no-link --print-build-logs
-
-      - name: Commit npmDeps hash to main
+      - name: Update npmDeps hash on main
         run: |
           set -euo pipefail
-
-          # Verify step may patch this file; discard before switching to main.
-          git restore nix/obsidianirc.nix
 
           git fetch origin main
           git checkout main
@@ -124,7 +116,7 @@ jobs:
             exit 0
           fi
 
-          nix build .#obsidianirc --no-link --print-build-logs
+          nix flake check && nix build .#obsidianirc --no-link --print-build-logs
 
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
